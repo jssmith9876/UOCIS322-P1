@@ -105,7 +105,7 @@ def respond(sock):
         site_request = parts[1][1:]
 
         # If the request starts with '~', '..', or '//'
-        if (site_request.startswith('~') or site_request.startswith('..') or site_request.startswith('//')):
+        if ('~' in parts[1] or '..' in parts[1] or '//' in parts[1]):
             transmit(STATUS_FORBIDDEN, sock)
 
         # If the request was found in the docroot directory
