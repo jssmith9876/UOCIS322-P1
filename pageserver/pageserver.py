@@ -96,6 +96,7 @@ def respond(sock):
     docroot = options.DOCROOT
     docroot_dir = os.listdir(docroot)
 
+    log.info("FULL PATH DIR: " + str(docroot_dir))
 
     parts = request.split()
     log.info(str(parts))
