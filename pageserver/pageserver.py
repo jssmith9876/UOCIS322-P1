@@ -18,11 +18,11 @@ import logging   # Better than print statements
 logging.basicConfig(format='%(levelname)s:%(message)s',
                     level=logging.INFO)
 log = logging.getLogger(__name__)
-# Logging level may be overridden by configuration 
+# Logging level may be overridden by configuration
 
 import socket    # Basic TCP/IP communication on the internet
 import _thread   # Response computation runs concurrently with main program
-
+import os
 
 def listen(portnum):
     """
@@ -89,10 +89,28 @@ def respond(sock):
     log.info("--- Received request ----")
     log.info("Request was {}\n***\n".format(request))
 
+    # Get the options from the configuration file
+    options = get_options()
+
+    # Get the files in the DOCROOT directory
+    docroot = options.DOCROOT
+    docroot_dir = os.listdir(docroot)
+
+
     parts = request.split()
+    log.info(str(parts))
     if len(parts) > 1 and parts[0] == "GET":
-        transmit(STATUS_OK, sock)
-        transmit(CAT, sock)
+
+        if (parts[1][1:] in docroot_dir):
+            transmit(STATUS_OK, sock)
+            file_split = parts[1].split('.')
+            file_type = file_split[len(file_split) - 1]
+            with open(docroot + str(parts[1])) as response_file:
+                transmit(response_file, sock)
+
+
+        # transmit(STATUS_OK, sock)
+        # transmit(CAT, sock)
     else:
         log.info("Unhandled request: {}".format(request))
         transmit(STATUS_NOT_IMPLEMENTED, sock)
