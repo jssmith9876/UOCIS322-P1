@@ -101,23 +101,20 @@ def respond(sock):
     parts = request.split()
     log.info(str(parts))
     if len(parts) > 1 and parts[0] == "GET":
-
-        # Slice off of the '/' from the request
-        site_request = parts[1][1:]
-
         # If the request starts with '~', '..', or '//'
         if ('~' in parts[1] or '..' in parts[1] or '//' in parts[1]):
             transmit(STATUS_FORBIDDEN, sock)
-
-        # If the request was found in the docroot directory
-        elif (site_request in docroot_dir):
-            transmit(STATUS_OK, sock)
-            with open(docroot + parts[1]) as response_file:
-                transmit(response_file.read(), sock)
-
-        # If the request was not found in the docroot directory
         else:
-            transmit(STATUS_NOT_FOUND, sock)
+            # Get the full directory of the request
+            request_dir = docroot + parts[1]
+            # If the request was found in the docroot directory
+            if (os.path.exists(request_dir)):
+                transmit(STATUS_OK, sock)
+                with open(request_dir) as response_file:
+                    transmit(response_file.read(), sock)
+            # If the request was not found in the docroot directory
+            else:
+                transmit(STATUS_NOT_FOUND, sock)
 
         # transmit(STATUS_OK, sock)
         # transmit(CAT, sock)
